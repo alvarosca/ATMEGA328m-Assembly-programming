@@ -1,16 +1,33 @@
+
+; Microprocessors laboratory [8607] - Course 3
+;             
+; Final project
+;
+; Objetivo : Develop a program which allows to
+; analyze, by means of a graph, the charge and
+; discharge of a RC which is fed by a signal 
+; generated and verified by the same micro.
+;
+; Authors:
+;	Sof√≠a Pistone - 102456
+;	√Ålvaro Scarramberg - 103370
+;
+; Project submission date : 23-07-2021
+;***********************************************************
+
 ; 
 ; Laboratorio de microprocesadores[8607] - Curso 3
 ;             
-; Trabajo Pr·ctico Integrador
+; Trabajo Pr√°ctico Integrador
 ;
 ; Objetivo : Desarrollar un programa el cual permite 
 ; analizar, mediante un grafico, la carga y descarga
-; de un RC el cual es alimentado mediante una seÒal 
+; de un RC el cual es alimentado mediante una se√±al 
 ; generada y verificada por el mimsmo micro.
 ;
 ; Autores:
-;	SofÌa Pistone - 102456
-;	¡lvaro Scarramberg - 103370
+;	Sof√≠a Pistone - 102456
+;	√Ålvaro Scarramberg - 103370
 ;
 ; Fecha de entrega: 23-07-2021
 ;***********************************************************
@@ -109,7 +126,7 @@ configurar_serial:
 	; 8N1: 8 bits de datos
 	; sin paridad y 1 bit de stop
 
-	; configurar modo de transmisiÛn: AsincrÛnico-->UMSEL=00
+	; configurar modo de transmisi√≥n: Asincr√≥nico-->UMSEL=00
 	; Paridad: desactivada-->UPM0=00
 	; stop bits: 1 bit-->USBS0=0
 	; Cantidad de bits del mensaje: 8-->UCSZ0=011
@@ -124,7 +141,7 @@ configurar_serial:
 	; Baudrate = 115200 bit/s --> FT= 11.52kByte/s
 	; Un byte tarda en enviarse: TT=86.8us
 
-	; Habilito la interrupciÛn por Tr. completa
+	; Habilito la interrupci√≥n por Tr. completa
 	lds R17, UCSR0B
 	ori R17, (1<<TXCIE0)	
 	sts UCSR0B, R17
@@ -135,7 +152,7 @@ configurar_serial:
 configurar_timers:
 	
 ;--------------------------------------------------------------------------
-; TIMER 1 - Modo Fast PWM ---> Genera la seÒal PWM
+; TIMER 1 - Modo Fast PWM ---> Genera la se√±al PWM
 ;--------------------------------------------------------------------------
 
 	; Se configura al timer 0 en modo Fast PWM
@@ -147,7 +164,7 @@ configurar_timers:
 		; COM0A = 01
 
 	; Cada 2 comparaciones se tiene un periodo 
-	; de la seÒal de salida por lo tanto:
+	; de la se√±al de salida por lo tanto:
 
 	; FPWM =  Fclk / ( 2 * (OCROA+1) * prescaler )
 
@@ -181,7 +198,7 @@ configurar_timers:
 	ldi temp, (0<<WGM13)|(0<<WGM12)|(1<<CS02)|(0<<CS01)|(1<<CS00)|(1<<ICES1)
 	sts TCCR1B, temp
 
-; Habilito interrupciÛn por captura
+; Habilito interrupci√≥n por captura
 	ldi temp, (1 << ICIE1 )
 	sts TIMSK1, temp
 
@@ -190,7 +207,7 @@ configurar_timers:
 ;	sts OCR1AH , temp
 ;	sts OCR1AL , r17
 
-; Habilito la interrupciÛn por overflow
+; Habilito la interrupci√≥n por overflow
 
 	lds temp, TIMSK1
 	ori temp, (1<<TOIE1)
@@ -203,7 +220,7 @@ configurar_timers:
 configurar_ADC:
 
 	; Se necesita que el tiempo que se tarda
-	; por conversiÛn sea mayor al tiempo que 
+	; por conversi√≥n sea mayor al tiempo que 
 	; se tarda en enviar el resultado
 
 	; TC>TT = 86.8us FC<FT = 11.52kHz
@@ -230,7 +247,7 @@ configurar_ADC:
 	; Se habilita al ADC:                ADEN=1
 	; Se habilita su interr.:            ADIE=1
 	; Se borra el flag:                  ADIF=0
-	; Se habilita el disparo autom·tico: ADATE=1
+	; Se habilita el disparo autom√°tico: ADATE=1
 	lds temp, ADCSRA
 	andi temp, ~((1<<ADIF))
 	ori temp, (1<<ADEN)|(1<<ADATE)|(1<<ADIE)|(1<<ADPS2)|(1<<ADPS0)|(1<<ADPS1)
@@ -249,9 +266,9 @@ configurar_int0 :	; Se configura por Pin change
 	ret
 
 ;***********************************************************
-; Rutina que se encarga de comenzar el envÌo del mensaje
-; inicial que indica el resultado de la verificaciÛn de
-; la seÒal medida por int0
+; Rutina que se encarga de comenzar el env√≠o del mensaje
+; inicial que indica el resultado de la verificaci√≥n de
+; la se√±al medida por int0
 ;
 ; Se utiliza a T como flag para decidir cual de los 
 ; mensajes se debe enviar
@@ -286,7 +303,7 @@ Enviar_Mensaje_Inicial_End:
 ;***********************************************************
 ComenzarTransmision:
 
-	; Realizar la primera conversiÛn del ADC
+	; Realizar la primera conversi√≥n del ADC
 	lds temp, ADCSRA
 	ori temp, (1<<ADSC)
 	sts ADCSRA, temp
@@ -300,7 +317,7 @@ ComenzarTransmision:
 ; Se reinicia T1 ante el primer flanco asc. o desc.
 ; detectado para comenzar a contar el primer semi-periodo
 ;
-; Uso T como flag para saber si ya comenzÛ el conteo
+; Uso T como flag para saber si ya comenz√≥ el conteo
 ;
 ;************************************************************************
 Handler_Int_Ext0:
@@ -334,10 +351,10 @@ fin_int:
 ; Rutina que se encarga de verificar que el el Duty - Cycle y F sean correctos.
 ;
 ; Mido 2 semiperiodos, si ambos son iguales entonces el duty cycle es 
-; correcto y si ademas el tiempo de duraciÛn de estos pertenece a cierto 
-; rango se comprueba que la frecuencia tambiÈn es adecuada.
+; correcto y si ademas el tiempo de duraci√≥n de estos pertenece a cierto 
+; rango se comprueba que la frecuencia tambi√©n es adecuada.
 ;
-; Uso C como flag para indicar cual de los semi-periodos se est· midiendo
+; Uso C como flag para indicar cual de los semi-periodos se est√° midiendo
 ;
 ;****************************************************************************
 Handler_Int_T1_Capt:
@@ -438,7 +455,7 @@ fin_Int_T1_Capt:
 ;*************************************************************************
 ; Handler de la int. por Overflow del timer 1
 ;
-; Si el timer 1 llega a overflow la seÒal medida tiene un periodo
+; Si el timer 1 llega a overflow la se√±al medida tiene un periodo
 ; demasiado grande por lo que se asume que se tiene un error
 ;
 ;*************************************************************************
@@ -451,7 +468,7 @@ Handler_Int_OVF1:
 	; Indico error con T
 	SET
 	
-	; EnvÌo el mensaje de verificaciÛn
+	; Env√≠o el mensaje de verificaci√≥n
 	rcall	Enviar_Mensaje_Inicial
 	
 	; Apago int0
@@ -475,9 +492,9 @@ Handler_Int_OVF1_End:
 	reti
 
 ;*************************************************************************
-; Handler de la int. por transmisiÛn completa 
+; Handler de la int. por transmisi√≥n completa 
 ;
-; Se encarga de realizar el envio del mensaje de verificaciÛn
+; Se encarga de realizar el envio del mensaje de verificaci√≥n
 ;
 ;*************************************************************************
 Handler_TXC:
@@ -487,14 +504,14 @@ Handler_TXC:
 	push R16
 
 	lpm R16, Z+	; Cargar caracter de la tabla
-	cpi R16, 0	; Revisar si se llegÛ al final del string
+	cpi R16, 0	; Revisar si se lleg√≥ al final del string
 	breq Fin_del_mensaje_inicial
 
 	sts UDR0, r16 ; Enviar el caracter
 	rjmp Handler_TXC_End 
 
 Fin_del_mensaje_inicial:
-    ; Desactivo la interrupciÛn por transmisiÛn completa
+    ; Desactivo la interrupci√≥n por transmisi√≥n completa
 	lds R17, UCSR0B
 	andi R17, ~(1<<TXCIE0) 
 	sts UCSR0B, R17
@@ -509,9 +526,9 @@ Handler_TXC_End:
 	reti
 
 ;*********************************************************************
-; Handler de la int. por conversiÛn completa del ADC
+; Handler de la int. por conversi√≥n completa del ADC
 ; 
-; Al terminar una conversiÛn simplemente se envÌa el resultado
+; Al terminar una conversi√≥n simplemente se env√≠a el resultado
 ;
 ;*********************************************************************
 Handler_Int_ADCC:
@@ -534,7 +551,7 @@ Handler_Int_ADCC_End:
 
 ;***********************************************************
 
-VerificacionCorrecta: .db "** El duty cycle es de 50% y la frecuencia de la seÒal PWM es de 60Hz **",0,0
+VerificacionCorrecta: .db "** El duty cycle es de 50% y la frecuencia de la se√±al PWM es de 60Hz **",0,0
 
-VerificacionIncorrecta: .db "** La seÒal medida no es la esperada **",0
+VerificacionIncorrecta: .db "** La se√±al medida no es la esperada **",0
 
