@@ -1,5 +1,8 @@
 %%
-% Leer datos del puerto serie
+% THIS IS THE MATLAB CODE USED TO READ THE SAMPLES
+% SENT BY TO THE MICROCONTROLLER TO THE COMPUTER
+% SO THAT WE CAN OBTAIN A GRAPH OF THE RESULTS
+
 clear all;
 clc
 
@@ -20,9 +23,10 @@ fopen(puerto_serial);
 y=fread(puerto_serial, length(t), 'uint8');
 
 %%
-% Generar el gr·fico de la tensiÛn del RC
+% Generate the graph of the RC circuit voltage
+% Generar el gr√°fico de la tensi√≥n del RC
 
-xcyan = (1/255)*[0,255,255];%Color de lÌnea%
+xcyan = (1/255)*[0,255,255];%Color de l√≠nea%
 dblue = (1/255)*[0,0,35];%Color de fondo%
 plot([(begin:10000)-begin]*T,y(begin:10000)*5/255,'color', xcyan , 'linewidth', 3)
 ylim([-0.1,5.1])
@@ -49,6 +53,7 @@ ax.MinorGridAlpha = 0.5;
 hold off
 
 %%
+% Extract the initial message
 % Extraer el mensaje inicial
 z=char(y);
 x=transpose(z(1:100));
@@ -56,6 +61,7 @@ g=extractBetween(x,"** ", " **");
 disp(g);
 
 %%
+% Close the model and delete the variables
 % Cerrar el puerto y borrar las variables
 fclose(puerto_serial);
 delete(puerto_serial);
